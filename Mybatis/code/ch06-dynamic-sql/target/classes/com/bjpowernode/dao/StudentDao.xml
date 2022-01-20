@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.dao.StudentDao">
+
+
+    <!--定义代码片段-->
+    <sql id="selectStudent">
+        select * from student
+    </sql>
+
+    <sql id="studentFieldList">
+        id,name,email
+    </sql>
+
+    <!--if
+        test: 使用对象的属性值作为条件
+    -->
+    <select id="selectIf" resultType="com.bjpowernode.domain.Student">
+
+        <include refid="selectStudent" />
+
+        where id=-1
+        <if test="name !=null and name!=''">
+           or  name = #{name}
+        </if>
+
+        <if test="age >0">
+            or age &lt; #{age}
+        </if>
+    </select>
+
+    <!--where-->
+    <select id="selectWhere" resultType="com.bjpowernode.domain.Student">
+        select <include refid="studentFieldList"/> from student
+        <where>
+            <if test="name !=null and name!=''">
+                or  name = #{name}
+            </if>
+
+            <if test="age >0">
+                or age &lt; #{age}
+            </if>
+        </where>
+
+    </select>
+
+
+    <!--foreach第一种方式， 循环简单类型的List-->
+    <select id="selectForeachOne" resultType="com.bjpowernode.domain.Student">
+        select * from student
+        <if test="list !=null and list.size>0">
+            where id in
+            <foreach collection="list" open="(" close=")" separator="," item="myid">
+                  #{myid}
+            </foreach>
+        </if>
+    </select>
+
+    <!--foreach第二种方式， 循环的List<Student>-->
+    <select id="selectForeachTwo" resultType="com.bjpowernode.domain.Student">
+        select * from student
+        <if test="list != null and list.size>0">
+            where id in
+            <foreach collection="list" open="(" close=")" separator="," item="stu">
+                  #{stu.id}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="selectAllStudents" resultType="com.bjpowernode.domain.Student">
+        select * from student order by id
+    </select>
+
+</mapper>

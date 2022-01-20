@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--使用外部属性配置文件
+        resource:指定类路径下的某个属性配置文件
+    -->
+    <properties resource="jdbc.properties" />
+
+    <!--设置日志-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <!--声明别名-->
+    <typeAliases>
+        <!--第一种语法格式
+            type:java类型的全限定名称（自定义类型）
+            alias:自定义别名
+
+            优点： 别名可以自定义
+            缺点： 每个类型必须单独定义
+        -->
+        <!--<typeAlias type="com.bjpowernode.domain.Student" alias="stu" />
+        <typeAlias type="com.bjpowernode.vo.QueryParam" alias="qp" />-->
+
+        <!--第二种方式
+            name:包名， mybatis会把这个包中所有类名作为别名（不用区分大小写）
+            优点：使用方便，一次给多个类定义别名
+            缺点: 别名不能自定义，必须是类名。
+        -->
+        <package name="com.bjpowernode.domain" />
+        <package name="com.bjpowernode.vo" />
+
+    </typeAliases>
+
+    <!--声明插件-->
+    <plugins>
+        <plugin interceptor ="com.github.pagehelper.PageInterceptor" />
+    </plugins>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <!--配置数据源： 创建Connection对象。-->
+            <dataSource type="POOLED">
+                <!--driver:驱动的内容-->
+                <property name="driver" value="${jdbc.driver}"/>
+                <!--连接数据库的url-->
+                <property name="url" value="${jdbc.url}"/>
+                <!--用户名-->
+                <property name="username" value="${jdbc.username}"/>
+                <!--密码-->
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--指定其他mapper文件的位置：
+        其他其他mapper文件目的是找到其他文件的sql语句
+    -->
+    <mappers>
+        <!--第一种方式， resources="mapper文件的路径"
+            优点：文件清晰。 加载的文件是明确的。
+                  文件的位置比较灵活。
+            缺点：文件比较多， 代码量会比较大， 管理难度大
+        -->
+        <!--<mapper resource="com/bjpowernode/dao/StudentDao.xml"/>-->
+
+        <!--
+           第二种方式，使用<package>
+           name:包名， mapper文件所在的包名。
+           特点： 把这个包中的所有mapper文件，一次加载。
+
+           使用要求：
+            1. mapper文件和dao接口在同一目录
+            2. mapper文件和dao接口名称完全一样。
+        -->
+        <package name="com.bjpowernode.dao" />
+
+    </mappers>
+</configuration>

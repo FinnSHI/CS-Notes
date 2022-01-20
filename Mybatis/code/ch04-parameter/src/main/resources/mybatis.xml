@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--设置日志-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <!--声明别名-->
+    <typeAliases>
+        <!--第一种语法格式
+            type:java类型的全限定名称（自定义类型）
+            alias:自定义别名
+
+            优点： 别名可以自定义
+            缺点： 每个类型必须单独定义
+        -->
+        <!--<typeAlias type="com.bjpowernode.domain.Student" alias="stu" />
+        <typeAlias type="com.bjpowernode.vo.QueryParam" alias="qp" />-->
+
+        <!--第二种方式
+            name:包名， mybatis会把这个包中所有类名作为别名（不用区分大小写）
+            优点：使用方便，一次给多个类定义别名
+            缺点: 别名不能自定义，必须是类名。
+        -->
+        <package name="com.bjpowernode.domain" />
+        <package name="com.bjpowernode.vo" />
+
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <!--配置数据源： 创建Connection对象。-->
+            <dataSource type="POOLED">
+                <!--driver:驱动的内容-->
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <!--连接数据库的url-->
+                <property name="url"
+                          value="jdbc:mysql://localhost:3306/springdb?useUnicode=true&amp;characterEncoding=utf-8"/>
+                <!--用户名-->
+                <property name="username" value="root"/>
+                <!--密码-->
+                <property name="password" value="123"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--指定其他mapper文件的位置：
+        其他其他mapper文件目的是找到其他文件的sql语句
+    -->
+    <mappers>
+        <mapper resource="com/bjpowernode/dao/StudentDao.xml"/>
+    </mappers>
+</configuration>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.dao.StudentDao">
+    <!-- 使用insert, update,delete,select标签写sql -->
+
+    <!--
+       parameterType:指定dao接口形参的类型
+                     这个属性的值可以使用 java类型的全限定名称或者 mybatis定义的别名
+
+
+       mybatis执行的sql语句： select id,name,email,age from student where id=?
+       ? 是占位符， 使用jdbc中的PreparedStatement执行这样的sql语句
+
+       PreparedStatement pst  = conn.preparedStatement("select id,name,email,age from student where id=?");
+
+       给  ？ 位置赋值
+       参数Integer ， 执行pst.setInt(1,1005);
+       参数是String， 执行pst.setString(1,"1005");
+
+      第一个用法： java类型的全限定类型名称   parameterType="java.lang.Integer"
+      第二个用法： mybatis定义的java类型的别名  parameterType="int"
+
+      parameterType：mybatis通过反射机制可以获取 dao接口方法参数的类型， 可以不写
+
+    -->
+    <select id="selectById"  parameterType="integer" resultType="student">
+        select id,name,email,age from student where id=#{studentId}
+    </select>
+
+    <!--
+       dao接口是一个简单类型的参数
+       mapper文件，获取这个参数值，使用#{任意字符}
+    -->
+    <select id="selectByEmail" resultType="com.bjpowernode.domain.Student">
+        select id,name,email,age from student where email=#{studentEmail}
+    </select>
+
+    <!--
+       多个简单类型的参数.
+       当使用了@Param命名后，例如@Param("myname").
+       在mapper中，使用#{命名的参数}， 例如 #{myname}
+    -->
+    <select id="selectByNameOrAge" resultType="com.bjpowernode.domain.Student">
+        select id,name,email,age from student where name=#{myname} or age=#{myage}
+    </select>
+
+    <!--
+       一个java对象作为方法的参数，使用对象的属性作为参数值使用
+       简单的语法： #{属性名} ， mybatis调用此属性的getXXX()方法获取属性值
+    -->
+   <!-- <select id="selectByObject" resultType="com.bjpowernode.domain.Student">
+        select id,name,email,age from student where name=#{name} or age=#{age}
+    </select>-->
+
+    <select id="selectByObject" resultType="com.bjpowernode.domain.Student">
+        select id,name,email,age from student where
+        name=#{name,javaType=java.lang.String,jdbcType=VARCHAR}
+        or
+        age=#{age,javaType=java.lang.Integer,jdbcType=INTEGER}
+    </select>
+
+
+
+
+    <select id="selectByQueryParam" resultType="com.bjpowernode.domain.Student">
+         select id,name,email,age from student where name=#{p1} or age=#{p2}
+    </select>
+
+    <!--
+       使用位置获取参数值， dao接口方法是多个简单类型的参数
+       语法： #{arg0}, #{arg1}....
+    -->
+    <select id="selectByPosition" resultType="com.bjpowernode.domain.Student">
+        select id,name,email,age from student where name=#{arg0} or age=#{arg1}
+    </select>
+
+    <!--
+       使用Map传递参数，
+       在mapper文件中，获取map的值，是通过key获取的，语法：#{key}
+    -->
+    <select id="selectStudentByMap" resultType="com.bjpowernode.domain.Student">
+         select id,name,email,age from student where name=#{myname} or age=#{myage}
+    </select>
+
+    <!--更新-->
+    <update id="updateStudent">
+        update student set name=#{name},email=#{email} where id=#{id}
+    </update>
+
+
+
+
+
+    <!--${}-->
+    <select id="queryStudent" resultType="com.bjpowernode.domain.Student">
+        select * from student where name=${studentName}
+    </select>
+
+    <!--id 列排序-->
+    <select id="queryStudentOrderById" resultType="com.bjpowernode.domain.Student">
+        select * from student order by id
+    </select>
+
+    <!--name 列排序-->
+    <select id="queryStudentOrderByName" resultType="com.bjpowernode.domain.Student">
+        select * from student order by name
+    </select>
+
+
+    <select id="queryStudentOrderByColName" resultType="com.bjpowernode.domain.Student">
+        select * from ${tableName} where name=#{myname} order by ${colName} desc
+    </select>
+
+</mapper>
