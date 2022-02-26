@@ -51,6 +51,7 @@
 ##### 2.1.5 方法区
 
 - 线程**共享**
+- 逻辑区域
 - 存储被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。
 
 
@@ -136,7 +137,7 @@
 
    - 怎么找到类的元数据信息
 
-     > 元数据：Data that describes other data
+     > 元数据：Data that describes other data，包括类、字段、方法定义和其他信息
 
    - 对象哈希码（延后到真正调用Object::hashCode()方法时才计算）
 
@@ -661,4 +662,382 @@ Garbage First
 3.5.1 Shenandoah收集器
 
 3.5.2 ZGC收集器
+
+
+
+
+
+## 虚拟机执行子系统
+
+### 4 类文件结构
+
+#### 4.1 Class类文件结构
+
+##### 4.1.1 魔数和版本号
+
+1. 魔数：头4个字节，0xCAFEBABE 
+
+   ​			用来确定是不是class文件
+
+2. 版本号：
+
+   - 5和6是次版本号
+   - 7和8是主版本号
+
+
+
+##### 4.1.2 常量池
+
+1. 常量池容量计数值：入口是一项2字节的数据，代表常量池容量计数
+
+   - 计数从1开始
+   - 比如：0x0016，十进制是22，则常量池中有21个数，是1~21
+
+2. 字面量
+
+   - 字符串
+   - final类型的常量值
+
+3. 符号引用：
+
+   - 导出或开放的Package
+
+   - 类和接口的全限定名
+
+   - 字段的名称和描述符
+
+     > 描述符就是private、public这些
+
+   - 方法的名称和描述符 
+
+   - 方法句柄和方法类型
+
+     > 方法句柄：类似C++函数指针，可以把函数作为参数传入方法。
+     >
+     > java.lang.invoke包
+     >
+     > - MethodHandle类
+     > - MethodType类
+
+   - 动态调用点和动态常量
+
+
+
+##### 4.1.3 访问标志
+
+- 2字节
+
+- 标志类的信息（比如该类是接口还是类，是不是public等等）
+
+
+
+##### 4.1.4 类索引、父类索引与接口索引集合
+
+- 类索引 this_class
+  - u2类型
+
+- 父类索引 super_class
+  - u2类型
+  - 除了java.lang.Object，其他类只有一个父类索引
+- 接口类型 intefaces：一组u2类型的集合
+
+
+
+##### 4.1.5 字符表集合
+
+- 字符表：描述接口或类中声明的**变量**
+
+  ![image-20220225161206498](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202202251612645.png)
+
+> - 对于数组类型，每一维度将使用一个前置的“[”字符来描述，如一个定义为“java.lang.String[][]”类型的二维数组将被记录成“[[Ljava/lang/String；”，一个整型数组“int[]”将被记录成“[I”
+> - 用描述符来描述方法时，按照先参数列表、后返回值的顺序描述，参数列表按照参数的严格顺序放在一组小括号“()”之内。如方法void inc()的描述符为“()V”，方法java.lang.String toString()的描述符为“()Ljava/lang/String；”，方法int indexOf(char[]source，int sourceOffset，int sourceCount，char[]target，int targetOffset，int targetCount，int fromIndex)的描述符为“([CII[CIII)I”。
+
+
+
+##### 4.1.6 方法表集合
+
+- 访问标志（access_flags）
+- 名称索引（name_index）
+- 描述符索引（descriptor_index）
+- 属性表集合（attributes）
+
+>方法里的代码被存储到方法属性表的code属性里去了
+
+
+
+##### 4.1.7 属性表集合
+
+1. **code** 属性
+
+> 对于一个没有参数又没有局部变量的非静态方法，表示局部变量的Locals和表示参数的Args_size仍是1
+>
+> - 因为在虚拟机调用实例方法时自动传入参数 this
+
+2. **Exceptions** 属性
+   - 列举方法 throws 后面的异常
+3. **LineNumberTable** 属性
+   - 描述源码行号和字节码行号的对应关系
+
+4. **LocalVariableTable** 及 **LocalVariableTypeTable** 属性
+   - LocalVariableTable属性用于描述栈帧中局部变量表的变量与Java源码中定义的变量之间的关系
+   - LocalVariableTypeTable属性，使用字段的特征签名来完成泛型的描述
+
+5. **SourceFile** 及 **SourceDebugExtension** 属性
+   - SourceFile 记录生成这个 Class 文件的<u>源码文件名称</u>
+   - SourceDebugExtension 属性用于存储额外的代码调试信息
+
+6. **ConstantValue** 属性
+   - ConstantValue会通知虚拟机自动为静态变量赋值
+     - 非static的变量是在实例构造器`<init>()`中赋值的
+     - static变量则在类构造器`<clinit>()`赋值或者使用ConstantValue
+
+7. **InnerClasses** 属性
+   - 记录内部类与宿主类之间
+
+8. **Deprecated** 及 **Synthetic** 属性
+   - Deprecate，布尔值。就是`@deprecated`标记的字段或者方法。
+   - Synthetic，布尔值。表示该字段或者方法不是源码的，而是编译器自动生成的
+
+9. **StackMapTable** 属性
+   - 字节码验证器。在编译阶段将一系列的验证类型（Verification Type）直接记录在Class文件之中
+
+10. **Signature** 属性
+    - 用于反射获取泛型类型。
+
+11. **BootstrapMethods **属性
+    - 保存invokedynamic指令引用的引导方法限定符
+
+12. **MethodParameters** 属性
+    - 记录方法的各个形参名称和信息
+
+13. **模块化相关**属性
+    - Module属性：除了表示该模块的名称、版本、标志信息以外，还存储了这个模块requires、exports、opens、uses和provides定义的全部内容
+    - ModulePackages属性：用于描述该模块中所有的包，不论是不是被export或者open的。
+    - ModuleMainClass属性：确定该模块的主类（Main Class）
+
+14. **运行时注解相关**属性
+    - 存储源码中注解信息
+
+
+
+#### 4.2 字节码指令
+
+
+
+#### 4.3 公有设计，私有实现
+
+
+
+### 5 类加载机制
+
+类加载机制：Java虚拟机把描述类的数据从编译好的Class文件里加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的Java类的过程。
+
+#### 5.1 类加载时机
+
+##### 5.1.1 类的生命周期
+
+![image-20220226133318320](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202202261333431.png)
+
+1. 加载
+2. 连接
+   - 验证
+   - 准备
+   - 解析
+3. 初始化
+4. 使用
+5. 卸载
+
+顺序确定的：加载—>验证—>准备—>初始化—>卸载
+
+类加载过程：加载—>连接（验证—>准备—>解析）—>初始化
+
+
+
+- 主动引用：**初始化**的<u>六</u>种情况（**<u>有且只有六种</u>**）：
+
+  - 遇到new、getstatic、putstatic、invokestatic四条字节码指令时
+    - **new对象**
+    - **读取和设置static字段**
+    - **调用static方法**
+  - **反射**：使用java.lang.reflect对类进行反射调用时
+  - **子类—>父类**：初始化类时，类的父类还没初始化
+    - 注意：子接口初始化时，并不需要父接口进行初始化。
+  - **主类**：虚拟机启动时，要先初始化主类 (包含`main()`方法的类)
+  - **方法句柄**：当使用JDK 7新加入的动态语言支持时，如果一个java.lang.invoke.MethodHandle实例最后的解析结果为REF_getStatic、REF_putStatic、REF_invokeStatic、REF_newInvokeSpecial四种类型的方法句柄，并且这个方法句柄对应的类没有进行过初始化，则需要先触发其初始化。
+  - **定义了default方法的接口**：接口含有default修饰的方法时，如果实现类发生了初始化，那该接口必须在其前先初始化
+
+- 被动引用：除了主动引用的六种情况，其他引用类型不会触发类的初始化。
+
+  - 示例一：
+
+  ```java
+  public class ClassInitTest {
+      public static void main(String[] args) {
+          System.out.println(SubClass.value);
+      }
+  }
+  
+  class SuperClass {
+      static {
+          System.out.println("superclass");
+      }
+  
+      public static int value = 123;
+  }
+  
+  class SubClass extends SuperClass {
+      static {
+          System.out.println("subclass");
+      }
+  }
+  ```
+
+  执行结果：
+
+  ![image-20220226140248616](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202202261402657.png)
+
+  分析：
+
+  > static修饰的代码块：随着类的加载而执行，且执行一次。
+  >
+  > 非static的代码块：随着对象的创建而执行。
+
+  对于static的字段，只有直接定义了该字段的类会被初始化。而子类引用父类的static字段，只会引发父类初始化，而不会引发子类初始化。
+  
+
+  - 示例二：
+
+    ```java
+    package org.fenixsoft.classloading;
+    /**
+    * 被动使用类字段演示二：
+    * 通过数组定义来引用类，不会触发此类的初始化
+    **/
+    public class NotInitialization {
+    	public static void main(String[] args) {
+    		SuperClass[] sca = new SuperClass[10];
+    	}
+    }
+    ```
+
+  - 示例三：
+
+    ```java
+    package org.fenixsoft.classloading;
+    /**
+    * 被动使用类字段演示三：
+    * 常量在编译阶段会存入调用类的常量池中，本质上没有直接引用到定义常量的类，因此不会触发定义常量的类的初始化
+    **/
+    public class ConstClass {
+    	static {
+    		System.out.println("ConstClass init!");
+    	}
+    	public static final String HELLOWORLD = "hello world"; // final定义的常量
+    }
+    /**
+    * 非主动使用类字段演示
+    **/
+    public class NotInitialization {
+    	public static void main(String[] args) {
+    		System.out.println(ConstClass.HELLOWORLD);
+    	}
+    }
+    ```
+
+    
+
+​		
+
+#### 5.2 类加载过程
+
+加载—>连接（验证—>准备—>解析）—>初始化
+
+##### 5.2.1 加载
+
+1. 通过类的全限定名称来获得定义此类二进制的字节流
+
+2. 将字节流定义的静态存储结构转化为方法区的运行时数据结构
+
+   > ##### 2.1.5 方法区
+   >
+   > - 逻辑上的区域
+   > - 线程**共享**
+   > - 存储被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。
+
+3. 内存中创建一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入口
+
+
+
+##### 5.2.2 验证
+
+连接阶段第一步，用于确保Class文件中的字节流信息符合Java虚拟机的规范
+
+1. 文件格式验证
+   - 魔数
+   - 版本
+   - 常量池常量
+   - 指向常量的索引
+   - 编码规范
+   - 文件是否完整或被附加其他信息
+
+2. 元数据验证
+
+   - 类
+   - 字段
+   - 方法定义
+
+3. 字节码验证（最复杂）：用于确定程序语义是否合法、符合逻辑
+
+   > 停机问题：
+   >
+   > 程序无法判断程序会在有限时间内完成，还是会死循环
+
+4. 符号引用验证：该验证发生在解析阶段，用于校验虚拟机将符号引用转化为直接引用时，是否存在问题。
+
+
+
+##### 5.2.3 准备
+
+正式为类中static变量分配内存到方法区（一个逻辑区域）和设置初始值（通常为0值）
+
+```java
+/*
+* 初始值为0
+*/
+public static int value = 123;
+```
+
+
+
+```java
+/*
+* 编译时Javac将会为value生成ConstantValue属性，在准备阶段虚拟机就会根据Con-stantValue的设置将value赋值为123
+*/
+public static final int value = 123;
+```
+
+
+
+##### 5.2.4 解析
+
+将java中符号引用替换成直接引用
+
+- 符号引用：
+  - 用一组符号来描述所引用的目标。引用的目标不一定是已经加载到虚拟机里的东西。
+- 直接引用：
+  - 直接指向目标的指针、相对偏移量或者直接定位到目标的句柄。
+  - 直接引用跟虚拟机实现的内存布局相关。
+  - 直接引用的目标必须已经加载在虚拟机内存里了。
+
+
+
+##### 5.2.5 初始化
+
+
+
+
+
+#### 5.3 类加载器
+
+#### 5.4 Java模块化系统
 
