@@ -200,7 +200,7 @@ java.lang
 
   - 当第一次put数据时，初始化16容量的数组
 
-- 当链表元素＞8且哈希表长度＞MIN_TREEIFY_CAPACITY（64），则转换成红黑树
+- 当链表元素＞8且哈希表长度＞MIN_TREEIFY_CAPACITY（即64），则转换成红黑树
 
   ```java
   if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
@@ -220,10 +220,12 @@ java.lang
 
 - 默认容量为16，负载因子为0.75
   - 当超过容量*负载因子时，就扩容，扩容成原来的两倍
-
 - 为什么负载因子为0.75？
   - Ideally, under random hashCodes, the frequency of nodes in bins follows a Poisson distribution.
   - 负载因子是0.75的时候，空间利用率比较高，而且避免了相当多的Hash冲突，使得底层的链表或者是红黑树的高度比较低，提升了空间效率。
+- 为什么扩容的值是原来的2的幂次数
+  - 为了进行(n-1)&hash的与运算
+  - (n-1)&hash 
 
 
 
