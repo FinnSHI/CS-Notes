@@ -68,24 +68,102 @@
 
   - String长度不能超过512m
 
+
+
+#### Hash
+
+- 使用场景：保存一个对象，一个对象有多个属性。
+  - 我项目中用来保存用户分布地域情况
+  
+- 底层原理：
+
+  - 当Hash中键值对少于512对，且每个键值对大小不超过64字节时，用ziplist保存
+
+    ziplist:
+
+    - 内存中连续的存储空间
+
+    - 元素用entry表示
+
+      ![img](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241432093.png)
+
+      zlbytes: ziplist长度
+
+      zltail：ziplist尾部偏移量
+
+      zllen：entry个数
+
+      entry：元素
+
+      zlend：0xFF，标识结尾
+
+      
+
+  - 否则用HashTable保存。
+
+    HashTable：
+
+    - 一个dictht指向一个数组
+    - 每个数组上的键值对用链表形式保存
+
+    ![image-20220324135352680](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241353787.png)
+
+
+- 扩容
+  - 基于原Hash表的2倍创建一个新的哈希表，然后把旧哈希表的内容转移到新哈希表里。
+  - 渐进式rehash：
+    - 旧哈希表的内容不会一下子转移到新哈希表，而是渐进式转移过去。用一个rehashidx字段来记录，rehashidx为0表示开始迁移。
+    - 当所有数据都从旧哈希表里转移过去后，释放旧哈希表的空间。rehashidx置为-1。
+- 收缩
+  - 类似于扩容，但是收缩成原哈希表1/2倍的空间。
+
+- 负载因子
+  - 当redis没有执行持久化操作（BGSAVE or BGREWAITEAOF），负载因子是1
+  - 当redis执行持久化操作（BGSAVE or BGREWAITEAOF），负载因子是5
+
+
+
 #### List
 
 有序列表
 
 - 使用场景：可以用来实现分页查询，或者读取用户评论数
 
-#### Hash
-
-- 使用场景：保存一个对象，一个对象有多个属性。
-  - 我项目中用来保存用户分布地域情况
 - 底层原理：
-  - 
+  
+  **3.0以前**：用ziplist + linkedlist保存
+  
+  - 当列表长度小于512，且所有元素都小于64字节时，用ziplist保存
+  
+  - 否则，用LinkedList保存
+  
+    LinkedList保存了头节点head，尾节点tail，列表长度
+  
+    LinkedList：
+  
+    ![image-20220324142217267](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241422356.png)
+  
+    **3.0以后**：用**<u>quicklist</u>**保存。这样可以节省双向列表保存pre和next指针的空间。
+  
+    - quicklist是ziplist和linkedlist的组合
+  
+      ![img](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241438435.png)
+
+
 
 #### Set
 
 - 使用场景：Set可以做并集、交集、差集。可以用来查看好友的共同列表。
+
 - 底层原理：
-  - 
+
+  - set元素少于512个，用intset来存储
+
+    ![image-20220324144301337](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241443378.png)
+
+  - 否则，存储类似hashtable，只是value赋null
+
+
 
 #### Zset
 
@@ -97,7 +175,15 @@
   - 微博热搜榜，名称+热力值
 
 - 底层原理：
-  - 
+  - 当zset长度小于128，且每个元素大小小于64k，用ziplist
+  
+  - 否则，用跳跃表
+  
+    跳表：时间复杂度为**O(logN)**
+  
+    ![img](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241443204.jpeg)
+  
+    
 
 
 
@@ -197,4 +283,123 @@ Append only file，默认关闭。AOF以日志形式保存Redis每个写操作�
 
 
 ## 主从复制
+
+### 一主多从
+
+![image-20220324154528732](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241545779.png)
+
+#### 特点
+
+- **写读分离**：主服务器写，从服务器读，从服务器不能写
+
+- **从服务器挂掉**：
+
+  - master服务器下的一个 slave1 服务器 s1 挂掉，s1 重启后，会自动变成一个 master 服务器。
+
+    把挂掉的服务器重新赋成master服务器的slave，slave仍然能读到master中的数据。
+
+- **主服务器挂掉**：
+
+  - master服务器挂掉后，它的slave服务器仍然是它的slave服务器。
+
+    master重启后，仍然是原来的master。
+
+
+
+### 主从复制原理
+
+> CAP原理：
+>
+> - C - Consistent ，**一致性**
+> - A - Availability ，**可用性**
+> - P - Partition tolerance ，**分区容忍性**
+>   分布式系统的节点往往都是分布在不同的机器上进行网络隔离开的，这意味着必然会有网络断开的风险，这个网络断开的场景的专业词汇叫着「**网络分区**」。
+>
+> 在网络分区发生时，两个分布式节点之间无法进行通信，我们对一个节点进行的修改操作将无法同步到另外一个节点，所以数据的「**一致性**」将无法满足，因为两个分布式节点的数据不再保持一致。除非我们牺牲「**可用性**」，也就是暂停分布式节点服务，在网络分区发生时，不再提供修改数据的功能，直到网络状况完全恢复正常再继续对外提供服务。
+>
+> 一句话概括 CAP 原理就是——网络分区发生时，一致性和可用性两难全。
+
+
+
+#### 主从复制原理
+
+![image-20220324163534966](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241635024.png)
+
+
+
+1. slave开启主从复制：设置主服务器master的ip和port。主从复制开启全是由从服务器slave发起。
+
+   有三种实现方式：
+
+   1. conf文件中写入：`slaveof master_ip master _port`
+   2. `redis-server --slaveof master_ip master_port`
+   3. `redis-cli`后，输入`slaveof master_ip master _port`
+
+2. 建立连接：开启主从复制后，master 和 slave 之间建立 socket 连接。
+
+3. 检查连接：slave 向 master 发送一个 ping 请求，来检查两者的连接状态。
+
+   - 如果 slave 收到 pong，证明连接正常。
+   - 如果 slave 没有收到 pong，或者收到错误信息，则 m 和 s 断开socket连接，并重连。
+
+   ![image-20220324211458486](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203242114536.png)
+
+4.  身份验证：如果 master 和 slave 都没有设置密码或者密码相同，则可以进行同步。否则，断开socket，并且重连。
+
+   ![image-20220324211716468](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203242117544.png)
+
+5. 同步：连接正常并且完成身份验证后，slave 向 master 发送 `psync` 命令，然后 master 和 slave 之间同步数据。slave 把数据库状态同步到和 master 相同。
+
+6. 命令传播：同步完成后，master 进行的新操作都要传播给 slave。
+
+   - 延迟传播：master 积攒多个 tcp 包后，再发送给 slave，通常是40ms发一次。提高了性能，损失了一致性。
+   - 立即传播：master 每进行一次操作，立即把新操作发送给 slave。保证了一致性，降低了性能。
+
+   以上通过 master 配置中的 repl-disable-tcp-nodelay 来设置。yes为延迟传播，no为立即传播。
+
+
+
+### 心跳检测
+
+
+
+
+
+### 全量复制和部分复制
+
+#### 全量复制
+
+![image-20220324225346762](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203242253806.png)
+
+1. slave 给 master 发送 sync 命令，请求全量复制
+2. master 将执行 bgsave，将写操作写成 RDB 文件，并且使用一个缓存，缓存放入写完 RDB 之后的新操作。
+3. master 给 slave 发送 RDB 文件，slave 收到以后，删除旧数据，执行 RDB，与 master 进行同步。
+4. master 给 slave 发送缓存区的写操作，slave 执行并保持和 master 同步的状态。
+5. 如果 slave 开启了 AOF，则会执行 bgrewriteaof，更新AOF至最新的状态。
+
+
+
+#### 部分复制
+
+Redis 2.8 以后，引入部分复制。slave 给 master 发送 psync 命令。然后决定是使用全量复制还是部分复制。
+
+- **offset**
+
+- **复制挤压缓冲区**
+
+  ![image-20220324230423385](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203242304435.png)
+
+- **runid**
+
+  
+
+
+
+
+
+### 集群
+
+![image-20220324154834805](https://gitee.com/FinnSHI/PicBed/raw/master/imgs/202203241548857.png)
+
+
 
