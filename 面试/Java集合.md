@@ -167,7 +167,7 @@ java.lang
 - Entry表示一对key和value
 - Entry由Set结构保存，是无序、不可重复的
 
-#### 1 HashMap
+#### 1 HashMap （⭐）
 
 - Map的主要实现类
 
@@ -220,12 +220,32 @@ java.lang
 
 - 默认容量为16，负载因子为0.75
   - 当超过容量*负载因子时，就扩容，扩容成原来的两倍
+
 - 为什么负载因子为0.75？
   - Ideally, under random hashCodes, the frequency of nodes in bins follows a Poisson distribution.
   - 负载因子是0.75的时候，空间利用率比较高，而且避免了相当多的Hash冲突，使得底层的链表或者是红黑树的高度比较低，提升了空间效率。
-- 为什么扩容的值是原来的2的幂次数
-  - 为了进行(n-1)&hash的与运算
-  - (n-1)&hash 
+  
+- **为什么扩容的值是原来的2的幂次数**
+
+  - 为了进行 (n-1)&hash 来计算索引位置
+
+  - 扩容的值是原来的2的幂次数，这样 n-1 就是开头为0，后面全是1的值
+
+  - 和 hash 进行 & 运算，会保留 hash 中后 x 位，
+
+    - 这样可以保证索引值肯定在capacity中
+
+    - 并且满足公式 (n-1)&hash = hash%n
+
+      ```
+      比如：
+      hash = 10，即1010
+      n = 8，即1000
+      则hash&(n-1) = 0010
+        hash%n = 2 = 0010
+      ```
+
+      
 
 
 
