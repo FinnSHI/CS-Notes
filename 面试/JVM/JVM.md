@@ -8,11 +8,11 @@
 
 #### 2.1 运行时内存区域
 
-![202201251016250](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252027530.png)
+![image-20220526133004811](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202205261330934.png)
 
 
 
-![202203122152417](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252027828.png)
+![image-20220526133020728](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202205261330881.png)
 
 
 
@@ -369,6 +369,12 @@ Java并没有使用这个方法。
 
 
 
+Java GC 流程：
+
+![image-20220626155927525](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202206261559610.png)
+
+
+
 ##### 3.2.1 标记-清除算法
 
 1. 先标记出要回收的对象
@@ -385,7 +391,7 @@ Java并没有使用这个方法。
 1. 内存中额外留下一片区域
 2. 每当对象清除完，把剩下的对象复制到保留区域中。
 
-![202202071452936](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252117296.png)
+![image-20220626155800858](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202206261558969.png)
 
 - 优点：
   - 空间连续
@@ -1701,5 +1707,4 @@ Java线程分为：
 - 如果此时，出现线程b竞争该锁对象的情况，则会等待全局安全点后，暂停持有偏向锁的线程A，然后检查线程A是否还活着。
   - 如果线程A不处于活动状态，则线程A设置为无锁状态，锁偏向于线程B。
   - 如果线程A仍处于活动状态，则说明产生了锁竞争。升级成为轻量级锁。
-
 - 轻量级锁是为了减少重量级锁带来的性能消耗。线程即将进入同步块时，如果此同步对象没有被锁定，那么虚拟机就会在线程的栈空间中，生成一个锁记录Lock Record空间，然后虚拟机使用CAS尝试把对象的Mark Word指向线程栈空间中的Lock Record。如果成功，则线程获得锁。轻量级锁允许两个线程竞争。但是如果两个以上的线程竞争，那么就必须膨胀为重量级锁。

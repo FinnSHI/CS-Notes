@@ -93,6 +93,45 @@ protected Object createProxy(
 
 #### @Autowired
 
+1. 属于Spring框架
+
+2. 默认使用类型（byType）进行注入
+
+   ```java
+   @Autowired   
+   public IUserService userService  
+   ```
+
+   比如这里，会按照接口类型IUserService进行注入，
+
+   - 如果这个接口只有<u>一个实现类</u>，那么会正常注入
+
+   - 如果这个接口有<u>多个实现类或没有实现类</u>，则会报错
+
+     ```java
+     @Autowired(required = false)
+     public IUserService userService  
+     ```
+
+​				可以指定required = false，这样，即使找不到bean也不会报错。
+
+
+
+3. @Autowired 和 @Qualifier 结合使用可以使 @Autowired 变为按照 byName 来注入。@Qualifier可以指定要注入的变量名。
+   - 这样，spring就会根据bean的id来进行注入。
+
 
 
 #### @Resource
+
+1. 属于J2EE，但是Spring支持该注解
+
+2. @Resource默认按byName自动注入
+
+3. @Resource可以指定 name 或者 type
+
+   如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不指定name也不指定type属性，这时将通过反射机制使用byName自动注入策略。
+
+   ![image-20220516135139586](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202205161352735.png)
+
+   

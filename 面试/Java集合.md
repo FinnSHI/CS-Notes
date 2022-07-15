@@ -120,7 +120,20 @@ java.lang
         }
     ```
   
+    - 为什么会 扩容之后仍小于最低存储要求minCapacity？因为`addAll(Collections c)`方法
     
+    - hugeCapacity(minCapacity);
+    
+      ```java
+      private static int hugeCapacity(int minCapacity) {
+          if (minCapacity < 0) // overflow
+              throw new OutOfMemoryError();
+          // 如果minCapacity超过Integer.MAX_VALUE-8, 则minCapacity=Integer.MAX_VALUE
+          return (minCapacity > MAX_ARRAY_SIZE) ?
+              Integer.MAX_VALUE :
+              MAX_ARRAY_SIZE;
+      }
+      ```
 
 
 
