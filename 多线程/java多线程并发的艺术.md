@@ -884,7 +884,7 @@ public class CountDownLatchTest {
 
 
 
-### 8.2CyclicBarrier
+### 8.2 CyclicBarrier
 
 > Cyclic：可循环
 >

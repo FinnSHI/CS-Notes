@@ -1,5 +1,13 @@
 # 谷粒商城
 
+## 可能会问的问题
+
+![image-20220720152034874](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207201520920.png)
+
+![image-20220720152050758](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207201520803.png)
+
+
+
 ## pdf
 
 [谷粒商城-分布式高级-图.pdf](file:///D:/谷粒商城/Guli Mall/课件和文档(老版)/高级篇/资料图片/谷粒商城-分布式高级-图.pdf)

@@ -4,7 +4,7 @@
 
 ### 1.1 Docker架构图
 
-![image-20211030145847957](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301458049.png)
+![image-20211030145847957](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108132.png)
 
 <br />
 
@@ -32,7 +32,7 @@
 - 守护进程运行在主机上，通过Socket从客户端访问。守护进程从Client接收命令并管理运行在主机上的容器
 - 容器，是一个运行时环境
 
-![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301537860.png)
+![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108887.png)
 
 <br />
 
@@ -42,7 +42,7 @@
 - 而容器内的应用进程直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便；
 - 每个容器之间互相隔离，每个容器有自己的文件系统 ，容器之间进程不会相互影响，能区分计算资源。
 
-![image-20211030153002120](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301530237.png)
+![image-20211030153002120](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108457.png)
 
 <br />
 
@@ -77,7 +77,7 @@
   >
   > - 对于一个精简的OS，rootfs可以很小，只需要包括最基本的命令、工具和程序库就可以了，因为底层直接用Host的kernel，自己只需要提供 rootfs 就行了。由此可见对于不同的linux发行版, bootfs基本是一致的, rootfs会有差别, 因此不同的发行版可以公用bootfs。
 
-  ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301559406.png)
+  ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108559.png)
 
 <br />
 
@@ -93,11 +93,11 @@
 
 以我们的pull为例，在下载的过程中我们可以看到docker的镜像好像是在一层一层的在下载
 
-![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301601755.png)
+![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108647.png)
 
 <br />
 
-<img src="https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301939328.png" alt="image-20211030193533650" style="zoom:50%;" />
+<img src="https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108936.png" alt="image-20211030193533650" style="zoom:50%;" />
 
 <br />
 
@@ -293,7 +293,7 @@ remove an or more images
 
 #### 3.1.9 容器日志
 
-![image-20211030173507422](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301735537.png)
+![image-20211030173507422](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108977.png)
 
 <br />
 
@@ -331,7 +331,7 @@ docker cp /usr/aa.txt mycontainer:/opt
 
 ### 3.2 常用指令总结
 
-![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110301925284.png)
+![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231109784.png)
 
 <br />
 
@@ -362,7 +362,7 @@ docker cp /usr/aa.txt mycontainer:/opt
 
   - **docker run -it -v /宿主机目录:/容器内目录 centos /bin/bash**
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110302030068.png)
+    ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108294.png)
 
   - **查看数据卷是否挂载成功**：`docker inspect xxxx`
 
@@ -372,7 +372,7 @@ docker cp /usr/aa.txt mycontainer:/opt
 
   - **容器和宿主机之间实现了数据共享**
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110302039477.png)
+    ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231108184.png)
 
     
 
@@ -402,21 +402,21 @@ docker cp /usr/aa.txt mycontainer:/opt
 
   - build后生成image
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311044999.png)
+    ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231109347.png)
 
   - run
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311045712.png)
+    ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231109010.png)
 
   - 查看
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311046023.png)
+    ![在这里插入图片描述](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231109328.png)
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311046076.png)
+    ![image-20220723111039654](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231110708.png)
 
   - 主机对应默认地址
 
-    ![在这里插入图片描述](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311047316.png)
+    ![image-20220723111050921](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231110986.png)
 
     
 
@@ -433,7 +433,7 @@ docker cp /usr/aa.txt mycontainer:/opt
 
 ​	命名的容器挂载数据卷，其它容器通过挂载这个(父容器)实现数据共享，挂载数据卷的容器，称之为数据卷容器
 
-![image-20211031110206714](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311102782.png)
+![image-20220723111100006](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231111073.png)
 
 #### 4.3.2 容器间数据共享
 
@@ -490,7 +490,7 @@ docker cp /usr/aa.txt mycontainer:/opt
 
 Dockerfile面向开发，Docker镜像成为交付标准，Docker容器则涉及部署与运维，三者缺一不可，合力充当Docker体系的基石。
 
-![image-20211031112445148](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311124207.png)
+![image-20220723111128882](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231111946.png)
 
 描述：
 
@@ -521,7 +521,7 @@ Dockerfile面向开发，Docker镜像成为交付标准，Docker容器则涉及�
 
 ​	Docker Hub 中 99% 的镜像都是通过在 base 镜像 scratch 中安装和配置需要的软件构建出来的.
 
-![image-20211031135548665](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202110311355727.png)
+![image-20220723111118647](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207231111709.png)
 
 <br>
 

@@ -1,6 +1,6 @@
 # Redis
 
-![202203232139349](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252130280.jpeg)
+![image-20220718230305195](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207182303276.png)
 
 ## 缓存
 
@@ -64,7 +64,7 @@
     }
     ```
 
-    ![202203232342526](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252130628.png)
+    ![image-20220722154238310](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221542377.png)
 
   - 避免缓冲区溢出：String进行修改时，Redis会检查剩余空间是否满足要求，不满足的话会扩展到足够的空间来保存String。
 
@@ -104,7 +104,7 @@
 
     - 元素用entry表示
 
-      ![202203241432093](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252130138.png)
+      ![image-20220722154249733](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221542793.png)
 
       zlbytes: ziplist长度
 
@@ -125,7 +125,7 @@
     - 一个dictht指向一个数组
     - 每个数组上的键值对用链表形式保存
 
-    ![202203241353787](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252131617.png)
+    ![image-20220722154259292](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221542381.png)
 
 
 - 扩容
@@ -139,6 +139,10 @@
 - 负载因子
   - 当redis没有执行持久化操作（BGSAVE or BGREWAITEAOF），负载因子是1
   - 当redis执行持久化操作（BGSAVE or BGREWAITEAOF），负载因子是5
+
+
+
+##### Hash 底层和 Java HashMap 的区别？
 
 
 
@@ -167,13 +171,13 @@
   
     LinkedList：
   
-    ![202203241422356](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252131480.png)
+    ![image-20220722154311530](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221543639.png)
   
     **3.0以后**：用**<u>quicklist</u>**保存。这样可以节省双向列表保存pre和next指针的空间。
   
     - quicklist是ziplist和linkedlist的组合
   
-      ![202203241438435](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252131983.png)
+      ![image-20220722154325150](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221543216.png)
 
 
 
@@ -191,7 +195,7 @@
 
   - set元素少于512个，用intset来存储
 
-    ![202203241443378](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252131570.png)
+    ![image-20220722154334078](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221543145.png)
 
   - 否则，存储类似hashtable，只是value赋null
 
@@ -218,9 +222,13 @@
   
     跳表：时间复杂度为**O(logN)**
   
-    ![202203241443204](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252131804.jpeg)
+    ![image-20220722154343935](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221543027.png)
   
     
+
+##### 跳表何时增加高度？
+
+
 
 
 
@@ -242,11 +250,11 @@
 
 订阅发布通信模式。
 
-![202203232302569](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132737.png)
+![image-20220722154353881](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221543922.png)
 
 - client1，client2，client5都订阅了channel1。
 
-![202203232302723](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132071.png)
+![image-20220722154403743](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221544781.png)
 
 - channel1广播message，订阅了它的client都能收到。
 
@@ -286,7 +294,7 @@ Redis会fork一个子进程进行持久化，然后先将数据写入一个临�
     - 第一次20秒内进行了5次操作，进行了一次持久化
     - 第二次20秒内只进行了1次操作，然后服务挂掉了，那这次操作就丢失了
 
-![202203222158314](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132463.png)
+![image-20220722154415534](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221544597.png)
 
 ##### Fork
 
@@ -323,7 +331,7 @@ Append only file，默认关闭。AOF以日志形式保存Redis每个写操作�
 
 ### 一主多从
 
-![202203241545779](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132896.png)
+![image-20220722154426665](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221544718.png)
 
 #### 特点
 
@@ -360,7 +368,7 @@ Append only file，默认关闭。AOF以日志形式保存Redis每个写操作�
 
 #### 主从复制原理
 
-![202203241635024](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132949.png)
+![image-20220722154441748](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221544812.png)
 
 
 
@@ -379,11 +387,11 @@ Append only file，默认关闭。AOF以日志形式保存Redis每个写操作�
    - 如果 slave 收到 pong，证明连接正常。
    - 如果 slave 没有收到 pong，或者收到错误信息，则 m 和 s 断开socket连接，并重连。
 
-   ![202203242114536](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252132566.png)
+   ![image-20220722154452148](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221544202.png)
 
 4.  身份验证：如果 master 和 slave 都没有设置密码或者密码相同，则可以进行同步。否则，断开socket，并且重连。
 
-   ![202203242117544](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252133760.png)
+   ![image-20220722154502656](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221545756.png)
 
 5. 同步：连接正常并且完成身份验证后，slave 向 master 发送 `psync` 命令，然后 master 和 slave 之间同步数据。slave 把数据库状态同步到和 master 相同。
 
@@ -406,7 +414,7 @@ Append only file，默认关闭。AOF以日志形式保存Redis每个写操作�
 
 #### 全量复制
 
-![202203242253806](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252133702.png)
+![image-20220722154518130](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221545187.png)
 
 1. slave 给 master 发送 sync 命令，请求全量复制
 2. master 将执行 bgsave，将写操作写成 RDB 文件，并且使用一个缓存，缓存放入写完 RDB 之后的新操作。
@@ -428,7 +436,7 @@ Redis 2.8 以后，引入部分复制。slave 给 master 发送 psync 命令。�
 
   - master 维护了一个复制积压缓冲区，这个复制积压缓冲区是一个先进先出的队列。master 在进行命令传播的时候，会把新的写操作写入这个复制挤压缓冲区。旧的写操作会在对头弹出。当 slave 要求进行部分复制的时候，如果需要复制的内容存在于复制积压缓冲区，那么 master 会进行部分复制，如果要复制的内容已经不在复制积压缓冲区，或者已经不完整，那么 master 会进行全量复制。
 
-  ![202203242304435](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252133181.png)
+  ![image-20220722154141795](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221541886.png)
 
 - **runid**
 
@@ -438,7 +446,7 @@ Redis 2.8 以后，引入部分复制。slave 给 master 发送 psync 命令。�
 
 **部分复制过程**：
 
-![202203251542968](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203252133096.png)
+![image-20220722154531984](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221545056.png)
 
 如果 master 返回 -err，说明 master 版本是2.8之前，无法识别 psync 命令。
 
@@ -446,7 +454,7 @@ Redis 2.8 以后，引入部分复制。slave 给 master 发送 psync 命令。�
 
 ### 哨兵
 
-![image-20220325182202354](https://raw.githubusercontent.com/FinnSHI/PictureBed/main/imgs/202203251822438.png)
+![image-20220722154545232](https://finn-typora.oss-cn-shanghai.aliyuncs.com/pic/202207221545338.png)
 
 
 
@@ -468,8 +476,8 @@ Redis 2.8 以后，引入部分复制。slave 给 master 发送 psync 命令。�
 
 
 		1. 对于一个数key，通过多个hash函数，算出多个值，每个值都在布隆过滤器对应的位置上置1。
-  		2. 当进来一个数，通过多个hash计算，去找对应位置上的值，如果该位置上有0，则该数一定不存在
-       - 如果位置上都是1，该数==<u>不一定</u>==存在。
+		2. 当进来一个数，通过多个hash计算，去找对应位置上的值，如果该位置上有0，则该数一定不存在
+	   - 如果位置上都是1，该数==<u>不一定</u>==存在。
 
 ​	优点：
 
